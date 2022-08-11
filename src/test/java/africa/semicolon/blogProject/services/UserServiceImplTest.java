@@ -45,7 +45,7 @@ class UserServiceImplTest {
         registerUserform.setUserName("Ololade");
         registerUserform.setPassword("1234");
         userService.registerUser(registerUserform);
-        //  assertEquals(1, userRepository.count());
+
 
         LoginUserRequest request = new LoginUserRequest();
         request.setUserName("Ololade");

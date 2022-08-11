@@ -1,10 +1,14 @@
 package africa.semicolon.blogProject.controller;
 
+import africa.semicolon.blogProject.dtos.requests.CreateBlogRequest;
 import africa.semicolon.blogProject.dtos.requests.LoginUserRequest;
 import africa.semicolon.blogProject.dtos.requests.RegisterUserRequest;
+import africa.semicolon.blogProject.dtos.responses.CreateBlogResponse;
 import africa.semicolon.blogProject.dtos.responses.LoginUserResponse;
 import africa.semicolon.blogProject.dtos.responses.RegisterUserResponse;
+import africa.semicolon.blogProject.exceptions.BlogExistsException;
 import africa.semicolon.blogProject.exceptions.UserExistsException;
+import africa.semicolon.blogProject.services.BlogService;
 import africa.semicolon.blogProject.services.UserService;
 import africa.semicolon.blogProject.services.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +24,8 @@ public class UserController {
 
     @Autowired
     UserService userService = new UserServiceImpl();
+    @Autowired
+    BlogService blogService;
 
     @PostMapping("/user")
     public ResponseEntity<?> registerUser(@RequestBody RegisterUserRequest request) {
@@ -38,6 +44,15 @@ public class UserController {
             return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
         } catch (UserExistsException message) {
             return new ResponseEntity<>(message.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+    @PostMapping("/user")
+    public ResponseEntity<?> createBlog(@RequestBody CreateBlogRequest createBlogRequest) {
+        try {
+            CreateBlogResponse createBlogResponse = userService.createBlog(createBlogRequest);
+            return new ResponseEntity<>(createBlogResponse, HttpStatus.CREATED);
+        } catch (BlogExistsException e) {
+          return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
