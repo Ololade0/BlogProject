@@ -10,10 +10,14 @@ import africa.semicolon.blogProject.dtos.requests.AddArticleRequest;
 import africa.semicolon.blogProject.dtos.requests.AddCommentRequest;
 import africa.semicolon.blogProject.dtos.requests.ViewArticleRequest;
 
-import africa.semicolon.blogProject.exceptions.ArticleExistsException;
+import africa.semicolon.blogProject.exceptions.ArticleDoesNotExistsException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 
 @Service
@@ -32,12 +36,15 @@ public class ArticleServiceImpl implements ArticleServices {
     }
 
     @Override
-    public Article viewArticle(ViewArticleRequest viewArticleRequest) {
-        Article article = articleRepository.findArticleByTitle(viewArticleRequest.getTitle());
-        if (article != null) {
-            throw new ArticleExistsException(article + "does not exist");
+    public Optional<Article> viewArticle(ViewArticleRequest viewArticleRequest) {
+        Optional<Article> article = articleRepository.findById(viewArticleRequest.getUserId());
+        if (article.isPresent()) {
+            return article;
+
         }
-        return article;
+
+        throw new ArticleDoesNotExistsException(article + "does not exist");
+
     }
 
     @Override
@@ -45,17 +52,37 @@ public class ArticleServiceImpl implements ArticleServices {
         articleRepository.delete(article);
     }
 
+
+
+
     @Override
     public Article saveComment(AddCommentRequest addCommentRequest) {
+
         Comment comment = commentService.addComment(addCommentRequest);
         Article article = articleRepository.findArticleByTitle(addCommentRequest.getTitle());
-        if (article.getBlogName() == addCommentRequest.getBlogName()) {
+        if (Objects.equals(article.getBlogName(), addCommentRequest.getBlogName())){
             article.getComments().add(comment);
-          ;
+
         }
         return articleRepository.save(article);
 
     }
+
+    @Override
+    public List<Article> getAllArticles() {
+        return articleRepository.findAll();
+    }
+
+    @Override
+    public long size() {
+        return articleRepository.count();
+    }
+
+    @Override
+    public List<Article> findAll() {
+        return articleRepository.findAll();
+    }
+
 
 }
 
@@ -70,19 +97,6 @@ public class ArticleServiceImpl implements ArticleServices {
 
 
 
-//    @Override
-//    public List<AllContactResponse> findContactBelongingTo(String userEmail) {
-//        User user = userRespository.findUserByEmailAddress(userEmail);
-//        List<Contact>allUserContact = user.getContacts();
-//        List<AllContactResponse> response = new ArrayList<>();
-//        for(var contact : allUserContact){
-//            AllContactResponse singleResponse = new AllContactResponse();
-//            Mapper.map(contact, singleResponse);
-//
-//            response.add(singleResponse);
-//        }
-//        return response;
-//    }
 
 
 

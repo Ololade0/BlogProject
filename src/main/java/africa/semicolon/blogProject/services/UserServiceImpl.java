@@ -1,9 +1,11 @@
 package africa.semicolon.blogProject.services;
 
 import africa.semicolon.blogProject.data.model.Blog;
+import africa.semicolon.blogProject.data.model.Comment;
 import africa.semicolon.blogProject.data.model.User;
 import africa.semicolon.blogProject.data.repository.BlogRepository;
 import africa.semicolon.blogProject.data.repository.UserRepository;
+import africa.semicolon.blogProject.dtos.requests.AddCommentRequest;
 import africa.semicolon.blogProject.dtos.requests.CreateBlogRequest;
 import africa.semicolon.blogProject.dtos.requests.LoginUserRequest;
 import africa.semicolon.blogProject.dtos.requests.RegisterUserRequest;
@@ -16,6 +18,7 @@ import africa.semicolon.blogProject.exceptions.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,8 +27,7 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     @Autowired
     private BlogRepository blogRepository;
-    @Autowired
-    private UserService userService;
+
 
 
     @Override
@@ -99,18 +101,24 @@ public class UserServiceImpl implements UserService {
         blog.setName(createBlogRequest.getName());
         var blog_ = blogRepository.save(blog);
         user.setBlog(blog_);
-        userService.reSave(user);
+        userRepository.save(user);
         CreateBlogResponse createBlogResponse = new CreateBlogResponse();
         createBlogResponse.setMessage("Blog successfully created");
         return createBlogResponse;
 
     }
 
-//    private void isExist(String name) {
-//        Blog savedBlog = blogRepository.findBlogByName(name);
-//        if (savedBlog != null) throw new BlogExistsException(name + "Already exist");
-//    }
+    @Override
+    public Comment addComment(AddCommentRequest addCommentRequest) {
+        return null;
     }
+
+    @Override
+    public List<User> findAllUsers() {
+        return userRepository.findAll();
+    }
+
+}
 
 
 

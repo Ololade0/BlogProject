@@ -4,6 +4,8 @@ import lombok.Data;
 
 @Data
 public class DeleteRequest {
+    private String id;
+    private String articleId;
     private String name;
     private String body;
     private String title;

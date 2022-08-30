@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 public interface ArticleRepository extends MongoRepository<Article,String> {
     Article findArticleByTitle(String title);
 
+
 }

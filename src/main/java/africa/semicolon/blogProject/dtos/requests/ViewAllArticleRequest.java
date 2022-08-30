@@ -5,14 +5,10 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class ViewArticleRequest {
-    public String blogName;
+public class ViewAllArticleRequest {
     private String body;
-    private String article;
     private String title;
     private String userId;
     private String userEmail;
 
-
-    }
-
+}

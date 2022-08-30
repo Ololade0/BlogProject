@@ -1,11 +1,10 @@
 package africa.semicolon.blogProject.services;
 
 import africa.semicolon.blogProject.data.model.User;
+import africa.semicolon.blogProject.data.repository.ArticleRepository;
 import africa.semicolon.blogProject.data.repository.CommentRepository;
 import africa.semicolon.blogProject.dtos.requests.*;
-
 import africa.semicolon.blogProject.exceptions.BlogExistsException;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +21,8 @@ class BlogServiceImplTest {
     @Autowired
     private CommentRepository commentRepository;
     @Autowired
+    private ArticleRepository articleRepository;
+    @Autowired
     private CommentServices commentServices;
     @Autowired
     private ArticleServices articleServices;
@@ -29,8 +30,10 @@ class BlogServiceImplTest {
     @AfterEach
     void setUp() {
 
+
         blogService.deleteAll();
         userService.deleteAll();
+        articleRepository.deleteAll();
     }
 
     @Test
@@ -110,9 +113,7 @@ class BlogServiceImplTest {
         request.setEmail("asake");
         request.setPassword("asaks");
         userService.registerUser(request);
-
         User user = userService.getUserByEmail("asake");
-
         assertNull(user.getBlog());
 
         //add blog to user
@@ -135,10 +136,9 @@ class BlogServiceImplTest {
         ViewArticleRequest viewArticleRequest = new ViewArticleRequest();
         viewArticleRequest.setUserEmail(user.getEmail());
         viewArticleRequest.setTitle("Gistlover");
+        viewArticleRequest.setUserId("1234");
+
         blogService.viewArticle(viewArticleRequest);
-        user = userService.getUserByEmail("asake");
-
-
         assertEquals(1, user.getBlog().getArticles().size());
         assertEquals("Fear", userService.getUserByEmail("asake").getBlog().getArticles().get(0).getTitle());
 
@@ -175,11 +175,16 @@ class BlogServiceImplTest {
         user = userService.getUserByEmail("asake");
 
 
-        ViewArticleRequest viewArticleRequest = new ViewArticleRequest();
-        viewArticleRequest.setUserId("1234");
+        ViewAllArticleRequest viewAllArticleRequest = new ViewAllArticleRequest();
+        viewAllArticleRequest.setUserId("1234");
+        viewAllArticleRequest.setBody("The fear of gistlover, is the fear of wisdom");
+        viewAllArticleRequest.setTitle("Fear");
+        blogService.viewAllArticles(viewAllArticleRequest);
+
 
         assertEquals(1, user.getBlog().getArticles().size());
         assertEquals("Fear", userService.getUserByEmail("asake").getBlog().getArticles().get(0).getTitle());
+
     }
 
     @Test
@@ -190,7 +195,6 @@ class BlogServiceImplTest {
         request.setEmail("asake");
         request.setPassword("asaks");
         userService.registerUser(request);
-
         User user = userService.getUserByEmail("asake");
 
         assertNull(user.getBlog());
@@ -201,20 +205,27 @@ class BlogServiceImplTest {
         createBlogRequest.setUserEmail(user.getEmail());
         blogService.createBlog(createBlogRequest);
         assertEquals(1, blogService.size());
-        //  assertNotNull(user.getBlog());
 
-        // add article to blog
         AddArticleRequest articleRequest = new AddArticleRequest();
         articleRequest.setUserId(user.getId());
         articleRequest.setTitle("GistLoverBlog");
         articleRequest.setBody("The fear of gistlover, is the fear of wisdom");
         blogService.addArticle(articleRequest);
+        user = userService.getUserByEmail("asake");
+
 
         DeleteRequest deleteRequest = new DeleteRequest();
-        deleteRequest.setTitle("GistLoverBlog");
-        deleteRequest.setName("Ololade");
+        var article = blogService.getArticleByTitle("GistLoverBlog");
+
+        deleteRequest.setId(user.getBlog().getId());
+        deleteRequest.setArticleId(article.getId());
+
         blogService.deleteArticle(deleteRequest);
-        assertEquals(0, userService.getUserByEmail("asake").getBlog().getArticles().size());
+
+        assertEquals(0, blogService.getALlArticles().size());
+
+
+
     }
 
     @Test
@@ -249,14 +260,13 @@ class BlogServiceImplTest {
         addCommentRequest.setBlogName("Oba");
         addCommentRequest.setBody("I love your blog");
         addCommentRequest.setTitle("Gistlover");
-      //  articleServices.addComment(addCommentRequest);
+        var comment = commentServices.addComment(addCommentRequest);
+        assertEquals("I love your blog", comment.getBody());
         assertEquals(1, commentRepository.count());
 
     }
 
 
-
-
-    }
+}
 
 

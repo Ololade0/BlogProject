@@ -11,6 +11,10 @@ import org.springframework.stereotype.Repository;
 public interface BlogRepository extends MongoRepository<Blog, String> {
 
     Blog findBlogByName(String name);
+    Blog findBlogById(String id);
+
+
+
 
 
 

@@ -18,4 +18,6 @@ public class Blog {
     private String name;
     @DBRef
     private List<Article> articles = new ArrayList<>();
+
+
 }
